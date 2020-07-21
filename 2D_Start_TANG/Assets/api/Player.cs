@@ -40,11 +40,14 @@ public class Player : MonoBehaviour
     void TryJump()
     {
 
-        if(IsGround && JumpKey)
+        aniPlayer.SetBool("jumping", JumpKey);
+
+
+        if (IsGround && JumpKey)
         {
-            
+
             playerRigidbody2D.AddForce(Vector2.up * yForce);
-            aniPlayer.SetTrigger("jump");
+            
 
 
         }
@@ -59,25 +62,26 @@ public class Player : MonoBehaviour
         transform.Translate(speed * h * Time.deltaTime, 0, 0);
 
         aniPlayer.SetBool("run", h != 0);
-        
-//AD左右鍵翻轉
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            sprPlayer.flipX = true;
-        }
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            sprPlayer.flipX = false;
-        }
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            sprPlayer.flipX = true;
-        }
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            sprPlayer.flipX = false;
-        }
+
+    ///    //AD左右鍵翻轉
+    ///    if (Input.GetKeyDown(KeyCode.A))
+    ///    {
+    //        sprPlayer.flipX = true;
+    //    }
+    //    if (Input.GetKeyDown(KeyCode.D))
+    //    {
+    //        sprPlayer.flipX = false;
+     //   }
+     //   if (Input.GetKeyDown(KeyCode.LeftArrow))
+    //    {
+     //       sprPlayer.flipX = true;
+    //    }
+    //    if (Input.GetKeyDown(KeyCode.RightArrow))
+    //    {
+    //        sprPlayer.flipX = false;
+    //    }
     }
+
 
     private void Dead()
     {
@@ -89,7 +93,7 @@ public class Player : MonoBehaviour
     }
 
     [Header("感應地板的距離")]
-    [Range(0,1f)]
+    [Range(0, 1f)]
     public float distance;
 
     [Header("偵測地板的射線起點")]
@@ -106,7 +110,7 @@ public class Player : MonoBehaviour
         {
             Vector2 start = groundCheck.position;
             Vector2 end = new Vector2(start.x, start.y - distance);
-            
+
             Debug.DrawLine(start, end, Color.blue);
             grounded = Physics2D.Linecast(start, end, groundLayer);
             return grounded;
@@ -116,7 +120,7 @@ public class Player : MonoBehaviour
     private void Start()
     {
 
-        playerRigidbody2D = GetComponent<Rigidbody2D>(); 
+        playerRigidbody2D = GetComponent<Rigidbody2D>();
         sprPlayer = GetComponent<SpriteRenderer>();
         aniPlayer = GetComponent<Animator>();
         hpBar = GameObject.Find("血條").GetComponent<Image>();
@@ -129,12 +133,12 @@ public class Player : MonoBehaviour
     /// <summary>
     /// 移動
     /// </summary>
- 
+
     private void Update()
     {
         Move();
         TryJump();
-        
+
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
