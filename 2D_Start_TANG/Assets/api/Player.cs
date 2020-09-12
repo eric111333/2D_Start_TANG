@@ -17,14 +17,81 @@ public class Player : MonoBehaviour
     private bool dead;
     private GameManager gm;
     Rigidbody2D playerRigidbody2D;
-
     [Header("移動速度"), Range(0, 100)]
     public float speed = 10;
-    /// <summary>
-    /// 跳躍
-    /// </summary>
     [Header("垂直向上推力")]
     public float yForce;
+    public static bool front;
+    public bool grounded, isjump;
+    public Joystick joy;
+    int jumpCount;
+
+
+    private void FixedUpdate()
+    {
+        if (dead) return;
+        grounded = Physics2D.OverlapCircle(groundCheck.position, 0.05f, groundLayer);
+        GroundMove();
+        Jump();
+        SwitchAnim();
+    }
+
+    void GroundMove()
+    {
+        float horizontalMove = joy.Horizontal;//Input.GetAxisRaw("Horizontal");
+        playerRigidbody2D.velocity =
+           new Vector2(horizontalMove * speed, playerRigidbody2D.velocity.y);
+        if (horizontalMove >= 0.01f)
+        {
+            transform.localScale = new Vector3(8 , 8, 8);
+        }
+        if (horizontalMove <= -0.01f)
+        {
+            transform.localScale = new Vector3(-8 , 8, 8);
+        }
+        if (horizontalMove > 0) front = true;
+        if (horizontalMove < 0) front = false;
+    }
+    void Jump()
+    {
+        if (grounded)
+        {
+            jumpCount = 2;
+            isjump = false;
+        }
+        if (joy.Vertical > 0.3f && grounded)
+        {
+            isjump = true;
+            playerRigidbody2D.velocity = new Vector2(playerRigidbody2D.velocity.x, yForce);
+            jumpCount--;
+            //jumpPressed = false;
+        }
+        else if (joy.Vertical > 0.9f && jumpCount > 0 && isjump)
+        {
+            playerRigidbody2D.velocity = new Vector2(playerRigidbody2D.velocity.x, yForce);
+            jumpCount--;
+            //jumpPressed = false;
+        }
+    }
+    void SwitchAnim()
+    {
+        aniPlayer.SetFloat("speed", Mathf.Abs(playerRigidbody2D.velocity.x));
+        if (grounded)
+        {
+            // aniPlayer.SetBool("fall", false);
+        }
+        else if (!grounded && playerRigidbody2D.velocity.y > 0)
+        {
+            aniPlayer.SetBool("jumping", true);
+        }
+        else if (playerRigidbody2D.velocity.y < 0)
+        {
+            aniPlayer.SetBool("jumping", false);
+            //aniPlayer.SetBool("fall", true);
+        }
+    }
+
+    /*
     public bool JumpKey
 
 
@@ -81,7 +148,7 @@ public class Player : MonoBehaviour
     //        sprPlayer.flipX = false;
     //    }
     }
-
+    */
 
     private void Dead()
     {
@@ -102,8 +169,8 @@ public class Player : MonoBehaviour
     [Header("地面圖層")]
     public LayerMask groundLayer;
 
-    public bool grounded;
-
+    //public bool grounded;
+    /*
     bool IsGround
     {
         get
@@ -116,7 +183,7 @@ public class Player : MonoBehaviour
             return grounded;
         }
     }
-
+    */
     private void Start()
     {
 
@@ -136,14 +203,13 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        Move();
-        TryJump();
+
 
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (dead) return;
+        //if (dead) return;
 
         if (collision.tag == "陷阱")
         {
